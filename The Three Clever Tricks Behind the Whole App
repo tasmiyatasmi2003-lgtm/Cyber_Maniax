@@ -1,0 +1,10 @@
+const counterRef = useRef(0);
+// Inside interval:
+counterRef.current++
+// Alert only stores the ID
+{ scenarioId: "SC-001", ... }
+
+// CorrelationPanel looks up the full scenario
+const scenario = SCENARIOS.find(s => s.id === alert.scenarioId);
+const scenario = SCENARIOS[index % SCENARIOS.length];
+// index=0 → 0, index=1 → 1, index=4 → 0, index=7 → 3...
