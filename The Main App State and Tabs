@@ -1,0 +1,63 @@
+export default function ASTRA() {
+  // Core state
+  const [alerts, setAlerts] = useState([]);          // All live alerts
+  const [selected, setSelected] = useState(null);    // Clicked alert for CorrelationPanel
+  const [stats, setStats] = useState({ 
+    detected: 147, blocked: 134, avgTime: 2.3, fpr: 3.2 
+  });
+  const [activeTab, setActiveTab] = useState("dashboard");
+  const counterRef = useRef(0); // Persists across renders without causing re-renders
+
+  // The simulation engine — runs once on mount
+  useEffect(() => {
+    const t = setInterval(() => {
+      const newAlert = generateLiveAlert(counterRef.current++);
+      
+      // Prepend new alert, keep max 50
+      setAlerts(prev => [newAlert, ...prev].slice(0, 50));
+      
+      // Increment stats
+      setStats(prev => ({
+        ...prev,
+        detected: prev.detected + 1,
+        blocked: newAlert.severity === "critical" 
+                 ? prev.blocked          // Critical threats are harder to auto-block
+                 : prev.blocked + 1,
+      }));
+    }, 4000); // Every 4 seconds
+
+    // Seed 5 alerts immediately so page isn't empty on load
+    const seed = Array.from({ length: 5 }, (_, i) => generateLiveAlert(i));
+    setAlerts(seed);
+    counterRef.current = 5;
+
+    return () => clearInterval(t); // Cleanup prevents memory leak
+  }, []);
+
+  // Tab rendering — conditional based on activeTab state
+  return (
+    <div style={{ background: "#020917" }}>
+      {/* Sticky navbar with tab buttons */}
+      <header>
+        {navItems.map(n => (
+          <button onClick={() => setActiveTab(n.id)}
+            style={{ 
+              background: activeTab === n.id 
+                ? "rgba(239,68,68,0.15)"  // Active tab: red tint
+                : "transparent" 
+            }}>
+            {n.label}
+          </button>
+        ))}
+      </header>
+
+      <main>
+        {activeTab === "dashboard"    && <DashboardView />}
+        {activeTab === "threats"      && <ThreatsView />}
+        {activeTab === "correlation"  && <CorrelationView />}
+        {activeTab === "mitre"        && <MITREMatrix />}
+        {activeTab === "attribution"  && <AttributionPanel />}
+      </main>
+    </div>
+  );
+}
