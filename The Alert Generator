@@ -1,0 +1,22 @@
+function generateLiveAlert(index) {
+  // Cycles through all 4 scenarios using modulo
+  const scenario = SCENARIOS[index % SCENARIOS.length];
+  
+  // Cycles through each step in that scenario's attack chain
+  const step = scenario.chain[index % scenario.chain.length];
+  
+  return {
+    id: `ALT-${Date.now()}`,      // Unique ID using timestamp
+    scenarioId: scenario.id,       // Links back to full scenario for CorrelationPanel
+    title: scenario.title,
+    apt: scenario.apt,             // Full APT group object with flag, color, name
+    layer: step.layer,             // "Network" / "Endpoint" / "Application" / "Email"
+    event: step.event,             // The actual event description text
+    severity: scenario.severity,
+    time: new Date().toLocaleTimeString("en-IN", { hour12: false }), // IST time
+    mitre: scenario.mitre[index % scenario.mitre.length],
+    ioc: scenario.iocs[index % scenario.iocs.length],
+    confidence: (scenario.confidence * 100).toFixed(0),
+    target: scenario.target,
+  };
+}
