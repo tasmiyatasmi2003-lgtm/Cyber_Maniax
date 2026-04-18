@@ -1,0 +1,61 @@
+// Sparkline: tiny line chart shown in each stat card
+function SparkLine({ data, color, height = 40, width = 120 }) {
+  const max = Math.max(...data);
+  const min = Math.min(...data);
+  const range = max - min || 1;
+  
+  // Convert each data value to an (x, y) coordinate
+  const pts = data.map((v, i) => {
+    const x = (i / (data.length - 1)) * width;
+    const y = height - ((v - min) / range) * (height - 4) - 2;
+    return `${x},${y}`;
+  }).join(" ");
+  
+  return (
+    <svg width={width} height={height}>
+      {/* The line */}
+      <polyline points={pts} fill="none" stroke={color} strokeWidth="2"/>
+      {/* The area fill below the line */}
+      <polyline 
+        points={`0,${height} ${pts} ${width},${height}`} 
+        fill={color} fillOpacity="0.12" stroke="none"/>
+    </svg>
+  );
+}
+
+// Donut chart: SVG circles with stroke-dasharray trick
+function DonutChart({ slices, size = 80 }) {
+  const total = slices.reduce((s, v) => s + v.value, 0);
+  let offset = 0;
+  const r = 28, cx = size/2, cy = size/2;
+  const circ = 2 * Math.PI * r; // Full circumference
+  
+  return (
+    <svg width={size} height={size}>
+      {/* Gray background ring */}
+      <circle cx={cx} cy={cy} r={r} fill="none" 
+              stroke="#1e293b" strokeWidth="12"/>
+      
+      {slices.map((s, i) => {
+        const pct = s.value / total;
+        const dash = pct * circ; // How much of circumference this slice takes
+        const el = (
+          <circle cx={cx} cy={cy} r={r} fill="none"
+            stroke={s.color} strokeWidth="12"
+            // dasharray: colored portion, then gap
+            strokeDasharray={`${dash} ${circ - dash}`}
+            // dashoffset: rotate so slices don't overlap
+            strokeDashoffset={-offset * circ}
+            style={{ transform: "rotate(-90deg)", 
+                     transformOrigin: `${cx}px ${cy}px` }}/>
+        );
+        offset += pct; // Move starting point for next slice
+        return el;
+      })}
+      
+      {/* Total count in center */}
+      <text x={cx} y={cy+5} textAnchor="middle" 
+            fill="#f1f5f9" fontSize="13">{total}</text>
+    </svg>
+  );
+}
