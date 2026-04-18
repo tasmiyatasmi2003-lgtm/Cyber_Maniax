@@ -1,0 +1,46 @@
+// Every nation-state hacker group ASTRA tracks
+const APT_GROUPS = {
+  China: [
+    { name: "APT40 (BRONZE MOHAWK)", alias: "Kryptonite Panda", 
+      flag: "🇨🇳", color: "#ef4444" },
+    // ...4 more Chinese groups
+  ],
+  Pakistan: [ /* SideWinder, Transparent Tribe */ ],
+  NorthKorea: [ /* Lazarus, Kimsuky */ ],
+};
+
+// The 8 MITRE ATT&CK tactics ASTRA covers
+const MITRE_TACTICS = [
+  { id: "TA0001", name: "Initial Access", 
+    techniques: ["T1566 Phishing", "T1195 Supply Chain", "T1190 Public-Facing Exploit"] },
+  // ...7 more tactics
+];
+
+// The 4 real attack scenarios that power every demo
+const SCENARIOS = [
+  {
+    id: "SC-001",
+    title: "Operation JADE TYPHOON",
+    apt: APT_GROUPS.China[0],        // Links to APT40 object above
+    severity: "critical",
+    mitre: [MITRE_TACTICS[0], ...],  // Which tactics this attack uses
+    chain: [                          // Step-by-step attack timeline
+      { layer: "Email", 
+        event: "Spear-phishing DOCX with CVE-2024-38200", 
+        time: "00:00" },
+      { layer: "Endpoint", 
+        event: "svchost.exe spawned by winword.exe", 
+        time: "04:23" },
+      { layer: "Network", 
+        event: "DNS beacon to staging[.]apt40[.]cloud", 
+        time: "09:47" },
+      { layer: "Application", 
+        event: "Classified Naval data — 2.3 GB exfil attempt", 
+        time: "18:02" },
+    ],
+    confidence: 0.94,
+    iocs: ["shadowpad.dll", "192.168.240.5", "staging.apt40.cloud"],
+    blocked: false,
+  },
+  // SC-002 RedEcho, SC-003 SideWinder, SC-004 Lazarus...
+];
