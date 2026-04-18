@@ -1,0 +1,26 @@
+function AlertRow({ alert, onClick, selected }) {
+  // Color per layer type
+  const layerColor = { 
+    Network: "#60a5fa",     // blue
+    Endpoint: "#f472b6",    // pink
+    Application: "#a78bfa", // purple
+    Email: "#fb923c"        // orange
+  };
+  
+  return (
+    <div onClick={onClick} style={{
+      // Red tint if selected, dark if not
+      background: selected ? "rgba(239,68,68,0.08)" : "rgba(15,23,42,0.6)",
+      border: selected 
+        ? "1px solid rgba(239,68,68,0.5)"  // red border when selected
+        : "1px solid rgba(100,116,139,0.2)", // gray border normally
+    }}>
+      <PulsingDot color={alert.severity === "critical" ? "#ef4444" : "#f97316"}/>
+      <span>{alert.title}</span>
+      <SeverityBadge severity={alert.severity}/>
+      <span style={{ color: layerColor[alert.layer] }}>{alert.layer}</span>
+      <span>{alert.apt?.flag} {alert.apt?.name}</span>
+      <span>{alert.mitre?.id} · {alert.mitre?.name}</span>
+    </div>
+  );
+}
