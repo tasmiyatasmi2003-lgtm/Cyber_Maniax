@@ -24,3 +24,32 @@ function AlertRow({ alert, onClick, selected }) {
     </div>
   );
 }
+function CorrelationPanel({ alert }) {
+  // Find the full scenario this alert belongs to
+  const scenario = SCENARIOS.find(s => s.id === alert.scenarioId);
+  
+  const [step, setStep] = useState(0);       // Which chain step is highlighted
+  const [executed, setExecuted] = useState(false);
+  const [executing, setExecuting] = useState(false);
+
+  useEffect(() => {
+    // Reset animation when a new alert is selected
+    setStep(0); setExecuted(false);
+    
+    // Animate attack chain steps — reveal one every 800ms
+    const t = setInterval(() => 
+      setStep(p => p < scenario.chain.length - 1 ? p + 1 : p)
+    , 800);
+    return () => clearInterval(t); // Cleanup on unmount
+  }, [alert.id]); // Re-run when alert changes
+
+  const handleExecute = () => {
+    setExecuting(true);
+    // Simulate 2 second playbook execution
+    setTimeout(() => { setExecuting(false); setExecuted(true); }, 2000);
+  };
+
+  // Renders: confidence, attribution, animated attack chain,
+  // IOC badges, MITRE tactic badges, execute button
+}
+
